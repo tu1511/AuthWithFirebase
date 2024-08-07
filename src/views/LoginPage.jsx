@@ -1,7 +1,10 @@
 import FullPageLoader from "../components/FullPageLoader.jsx";
 import { useState } from "react";
 import { auth } from "../firebase/config.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,18 +19,41 @@ function LoginPage() {
   const handleSignup = (e) => {
     e.preventDefault();
     setError("");
+
     createUserWithEmailAndPassword(
       auth,
       userCredentials.email,
       userCredentials.password
     )
       .then((userCredential) => {
-        const user = userCredential.user;
+        console.log(userCredential.user);
+        // const user = userCredential.user;
       })
       .catch((error) => {
         setError(error.message);
       });
   };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setError("");
+
+    signInWithEmailAndPassword(
+      auth,
+      userCredentials.email,
+      userCredentials.password
+    )
+      .then((userCredential) => {
+        console.log(userCredential.user);
+
+        // const user = userCredential.user;
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+  const handlePasswordReset = (e) => {};
 
   return (
     <>
@@ -75,7 +101,9 @@ function LoginPage() {
               />
             </div>
             {loginType == "login" ? (
-              <button className="active btn btn-block">Login</button>
+              <button onClick={handleLogin} className="active btn btn-block">
+                Login
+              </button>
             ) : (
               <button onClick={handleSignup} className="active btn btn-block">
                 Sign Up
@@ -84,7 +112,9 @@ function LoginPage() {
 
             {error && <div className="error">{error}</div>}
 
-            <p className="forgot-password">Forgot Password?</p>
+            <p onClick={handlePasswordReset} className="forgot-password">
+              Forgot Password?
+            </p>
           </form>
         </section>
       </div>
