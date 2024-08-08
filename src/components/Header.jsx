@@ -1,36 +1,45 @@
 import { NavLink } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/config.js";
 
-function Header({pageTitle}) {
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/usersSlice.js";
 
-    return (
-      <>
+// eslint-disable-next-line react/prop-types
+function Header({ pageTitle }) {
+  const dispatch = useDispatch();
 
-            <h1>{pageTitle}</h1>
+  const hadleSignOut = () => {
+    if (confirm("Are you sure you want to log out?")) {
+      signOut(auth)
+        .then(() => {
+          dispatch(setUser(null));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
 
-            <div className="header-btns">
+  return (
+    <>
+      <h1>{pageTitle}</h1>
 
-                    <NavLink to="/">
-                      <button className="btn">
-                          Books
-                      </button>
-                    </NavLink>
+      <div className="header-btns">
+        <NavLink to="/">
+          <button className="btn">Books</button>
+        </NavLink>
 
-                    <NavLink to="/add-book">
-                      <button className="btn">
-                          Add Book +
-                      </button>
-                    </NavLink>
+        <NavLink to="/add-book">
+          <button className="btn">Add Book +</button>
+        </NavLink>
 
-                    <button className="btn transparent">
-                      Logout
-                    </button>
+        <button onClick={hadleSignOut} className="btn transparent">
+          Logout
+        </button>
+      </div>
+    </>
+  );
+}
 
-               
-            </div>
-    
-      </>
-    )
-  }
-  
-  export default Header
-  
+export default Header;

@@ -1,17 +1,37 @@
 import FullPageLoader from "../components/FullPageLoader.jsx";
 import { useState } from "react";
 import { auth } from "../firebase/config.js";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/usersSlice.js";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 
 function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [loginType, setLoginType] = useState("login");
   const [userCredentials, setUserCredentials] = useState({});
   const [error, setError] = useState("");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      dispatch(
+        setUser({
+          id: user.uid,
+          email: user.email,
+        })
+      );
+    } else {
+      dispatch(setUser(null));
+    }
+    if (isLoading) {
+      setIsLoading(false);
+    }
+  });
 
   const handleCredentials = (e) => {
     setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
@@ -25,14 +45,9 @@ function LoginPage() {
       auth,
       userCredentials.email,
       userCredentials.password
-    )
-      .then((userCredential) => {
-        console.log(userCredential.user);
-        // const user = userCredential.user;
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    ).catch((error) => {
+      setError(error.message);
+    });
   };
 
   const handleLogin = (e) => {
@@ -43,15 +58,9 @@ function LoginPage() {
       auth,
       userCredentials.email,
       userCredentials.password
-    )
-      .then((userCredential) => {
-        console.log(userCredential.user);
-
-        // const user = userCredential.user;
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    ).catch((error) => {
+      setError(error.message);
+    });
   };
 
   const handlePasswordReset = () => {
